@@ -1,3 +1,4 @@
+
 {
   "expo": {
     "name": "HogarEficiente",
@@ -9,7 +10,10 @@
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "backgroundModes": [
+        "fetch"
+      ]
     },
     "android": {
       "adaptiveIcon": {
@@ -38,7 +42,8 @@
             "backgroundColor": "#000000"
           }
         }
-      ]
+      ],
+      "expo-background-fetch"
     ],
     "experiments": {
       "typedRoutes": true,

@@ -1,31 +1,39 @@
-// Importamos componentes necesarios de Expo y React Native
+
 import { Image } from 'expo-image';
 import React from 'react';
 import { ActivityIndicator, Button, StyleSheet, Text, View } from 'react-native';
 
 import ParallaxScrollView from '@/components/parallax-scroll-view';
+import { scheduleTask, cancelTask } from '../../services/TaskScheduler';
 
-// Componente principal de la pantalla de inicio
 export default function HomeScreen() {
-  // Estado para el consumo histórico y la carga
   const [historicalConsumption, setHistoricalConsumption] = React.useState<number | null>(null);
   const [loading, setLoading] = React.useState(true);
+  const [isTaskScheduled, setIsTaskScheduled] = React.useState(false);
 
-  // Al montar el componente, simulamos la carga de datos históricos
   React.useEffect(() => {
-    setLoading(true); // Mostramos el indicador de carga
+    setLoading(true);
     setTimeout(() => {
-      // Simulamos una petición de red generando un número aleatorio entre 10 y 100 kWh
       const randomConsumption = Math.floor(Math.random() * 90) + 10;
-      setHistoricalConsumption(randomConsumption); // Guardamos el valor simulado
-      setLoading(false); // Ocultamos el indicador de carga
-    }, 2000); // Esperamos 2 segundos para simular la espera
+      setHistoricalConsumption(randomConsumption);
+      setLoading(false);
+    }, 2000);
   }, []);
 
-  // Renderizado de la interfaz de usuario
+  const handleToggleMonitoring = () => {
+    if (isTaskScheduled) {
+      console.log("Button 'Cancel Monitoring' pressed. Attempting to cancel task.");
+      cancelTask();
+      setIsTaskScheduled(false);
+    } else {
+      console.log("Button 'Schedule Monitoring' pressed. Attempting to schedule task.");
+      scheduleTask();
+      setIsTaskScheduled(true);
+    }
+  };
+
   return (
-  // ParallaxScrollView da un efecto visual moderno en la cabecera
-  <ParallaxScrollView
+    <ParallaxScrollView
       headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
       headerImage={
         <Image
@@ -33,20 +41,17 @@ export default function HomeScreen() {
           style={styles.reactLogo}
         />
       }>
-      {/* Cabecera visual con gradiente y el nombre de la app */}
       <View style={styles.headerGradient}>
         <View style={styles.headerContent}>
           <Text style={styles.headerIcon}>🏠</Text>
           <Text style={styles.headerTitle}>Hogar Eficiente</Text>
         </View>
       </View>
-      {/* Tarjeta con sombra que muestra el consumo histórico */}
       <View style={styles.cardContainer}>
         <View style={styles.cardShadow}>
           <View style={styles.card}>
             <Text style={styles.energyIcon}>⚡</Text>
             <Text style={styles.cardTitle}>Consumo histórico</Text>
-            {/* Indicador de carga mientras se obtienen los datos */}
             {loading ? (
               <ActivityIndicator size="large" color="#007AFF" style={{marginVertical: 16}} />
             ) : (
@@ -57,14 +62,13 @@ export default function HomeScreen() {
           </View>
         </View>
       </View>
-      {/* Botón estilizado para programar el monitoreo */}
       <View style={styles.buttonContainer}>
-        <Text style={styles.buttonLabel}>¿Quieres programar el monitoreo?</Text>
+        <Text style={styles.buttonLabel}>Controlar el monitoreo de consumo</Text>
         <View style={styles.buttonWrapper}>
           <Button
-            title="Programar Monitoreo"
-            color="#4CAF50"
-            onPress={() => {}}
+            title={isTaskScheduled ? "Cancelar Monitoreo" : "Programar Monitoreo"}
+            color={isTaskScheduled ? "#f44336" : "#4CAF50"}
+            onPress={handleToggleMonitoring}
           />
         </View>
       </View>
@@ -72,14 +76,13 @@ export default function HomeScreen() {
   );
 }
 
-// Estilos visuales para los componentes
 const styles = StyleSheet.create({
   headerGradient: {
     width: '100%',
     paddingVertical: 32,
     alignItems: 'center',
     justifyContent: 'center',
-  backgroundColor: '#4CAF50',
+    backgroundColor: '#4CAF50',
     borderBottomLeftRadius: 32,
     borderBottomRightRadius: 32,
     marginBottom: 8,
@@ -109,10 +112,6 @@ const styles = StyleSheet.create({
     textShadowOffset: { width: 0, height: 2 },
     textShadowRadius: 8,
     letterSpacing: 2,
-  },
-  stepContainer: {
-    gap: 8,
-    marginBottom: 8,
   },
   reactLogo: {
     height: 178,
@@ -168,6 +167,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginTop: 8,
     marginBottom: 32,
+    gap: 10
   },
   buttonLabel: {
     fontSize: 16,
